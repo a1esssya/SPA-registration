@@ -1,12 +1,14 @@
 import { Box } from '@mui/material';
 import AppBar from '../components/AppBar';
+import Breadcrumbs from '../components/Breadcrumbs';
 import MainPageInfo from './MainPageInfo';
 
 export default function MainPage() {
   return (
-    <Box>
+    <Box sx={{}}>
       <AppBar title="Registration" sx={{ position: 'fixed' }} />
-      <MainPageInfo />
+      <Breadcrumbs sx={{ pt: '70px', px: '10px' }} />
+      <MainPageInfo sx={{ mb: '70px', mt: '4%' }} />
       <AppBar
         title="The task was completed by Alesia"
         sx={{ position: 'fixed', left: '0', bottom: '0' }}

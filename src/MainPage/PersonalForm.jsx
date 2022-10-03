@@ -14,6 +14,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import { number, object, string, array } from 'yup';
+import { useState } from 'react';
 import FormikTextField from '../components/FormikTextField';
 import { editSignUpAction } from '../actions/isSignUp';
 import { pushDataAction } from '../actions/userInfo';
@@ -22,14 +23,31 @@ import Dialog from '../components/Dialog';
 
 export default function PersonalForm() {
   const dispatch = useDispatch();
-
+  const [birthError, setBirthError] = useState(false);
   const toSignUpForm = () => {
     dispatch(editSignUpAction());
   };
 
+  function birthValidate(day, month, year) {
+    const today = new Date();
+    const eighteenYearsBack = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDay() + 2
+    );
+    const ninetyYearsBack = new Date(
+      today.getFullYear() - 90,
+      today.getMonth(),
+      today.getDay() + 2
+    );
+    const userDate = new Date(year, month, day);
+    const result = eighteenYearsBack >= userDate && ninetyYearsBack <= userDate;
+    setBirthError(!result);
+    return result;
+  }
+
   const handleSubmit = (values, { setSubmitting }) => {
     setSubmitting(true);
-
     const {
       firstName,
       lastName,
@@ -40,17 +58,21 @@ export default function PersonalForm() {
       ocean,
       hobby,
     } = values;
-    dispatch(
-      pushDataAction([
-        { name: 'First Name', value: firstName },
-        { name: 'Last Name', value: lastName },
-        { name: 'Sex', value: sex },
-        { name: 'Birthday', value: `${birthDD}.${birthMM}.${birthYY}` },
-        { name: 'Your Favorite Ocean', value: ocean },
-        { name: 'Hobby', value: hobby.join(', ') },
-      ])
-    );
-    dispatch(openDialogAction());
+
+    const isBirthOk = birthValidate(birthDD, birthMM, birthYY);
+    if (isBirthOk) {
+      dispatch(
+        pushDataAction([
+          { name: 'First Name', value: firstName },
+          { name: 'Last Name', value: lastName },
+          { name: 'Sex', value: sex },
+          { name: 'Birthday', value: `${birthDD}.${birthMM}.${birthYY}` },
+          { name: 'Your Favorite Ocean', value: ocean },
+          { name: 'Hobby', value: hobby.join(', ') },
+        ])
+      );
+      dispatch(openDialogAction());
+    }
     setSubmitting(false);
   };
 
@@ -195,6 +217,9 @@ export default function PersonalForm() {
             sx={{ width: '30%' }}
           />
         </Box>
+        {birthError ? (
+          <Typography color="red">you must be 18 to 90 years old</Typography>
+        ) : null}
         <Box
           sx={{
             width: '85%',
